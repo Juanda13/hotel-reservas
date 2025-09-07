@@ -1,0 +1,21 @@
+# Java / Maven
+target/
+*.class
+*.log
+# Keep the Maven wrapper in the repo (DO NOT ignore it).
+# .mvn/wrapper/maven-wrapper.jar  ← do not add to gitignore
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# IDEs
+.idea/
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Docker / env
+**/.env
