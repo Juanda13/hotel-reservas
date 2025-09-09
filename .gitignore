@@ -1,21 +1,44 @@
-# Java / Maven
+# ---------- Java / Maven ----------
 target/
 *.class
 *.log
-# Keep the Maven wrapper in the repo (DO NOT ignore it).
-# .mvn/wrapper/maven-wrapper.jar  ← do not add to gitignore
-# Node / Angular
+# Mantén el wrapper de Maven en el repo (NO lo ignores)
+# .mvn/wrapper/maven-wrapper.jar  ← NO añadir a .gitignore
+
+# ---------- Node / Angular ----------
 node_modules/
 dist/
 .angular/
+out-tsc/
+bazel-out/
+tmp/
+# logs de npm/yarn
+npm-debug.log*
+yarn-error.log*
+# cache y cobertura
+.angular/cache/
+.sass-cache/
+coverage/
+# varios
+connect.lock
+libpeerconnection.log
+testem.log
+typings/
+.history/
 
-# IDEs
+# ---------- IDEs ----------
 .idea/
 .vscode/
+.project
+.classpath
+.settings/
+*.launch
+*.sublime-workspace
+.c9/
 
-# OS
+# ---------- OS ----------
 Thumbs.db
 .DS_Store
 
-# Docker / env
+# ---------- Docker / env ----------
 **/.env
