@@ -1,5 +1,6 @@
 package com.juanda.backend.web;
 
+import com.juanda.backend.web.error.ApiValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -79,9 +80,7 @@ public class SearchController {
     ) {
         // Validaciones simples (por ahora)
         if (!checkOut.isAfter(checkIn) || guests < 1) {
-            return ResponseEntity.badRequest().body(
-                Map.of("error", "Parámetros inválidos: checkOut debe ser posterior a checkIn y guests >= 1")
-            );
+            throw new ApiValidationException("checkOut debe ser posterior a checkIn y guests >= 1");
         }
 
         // MOCK (luego conectaremos con inventario real + precios)
