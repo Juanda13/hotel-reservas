@@ -12,7 +12,7 @@ public interface AvailabilityMapper {
 
     @Mapping(target = "price", source = "totalPrice")
     SearchResultDTO toDto(RoomAvailabilityProjection p);
-    
+
     List<SearchResultDTO> toDtoList(List<RoomAvailabilityProjection> list);
 
 }
