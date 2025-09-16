@@ -47,20 +47,18 @@ class RoomInventoryRepositoryIT extends PostgresTC {
     void should_exclude_blocked_room_R201_when_range_includes_blocked_day_plus3() {
         // En V2__seed.sql bloqueamos R201 en CURRENT_DATE + 3
         LocalDate checkIn = LocalDate.now().plusDays(3);
-        LocalDate checkOut = checkIn.plusDays(2); // 1 noche efectiva (HAVING nights=1)
+        LocalDate checkOut = checkIn.plusDays(1); // ✅ 1 noche: sólo día +3
         int guests = 2;
         int nights = 1;
 
-        List<RoomAvailabilityProjection> list =
-            inventoryRepo.findAvailableRooms(checkIn, checkOut, guests, nights);
+        var list = inventoryRepo.findAvailableRooms(checkIn, checkOut, guests, nights);
 
-        // Mapeamos ids -> code para chequear que no este R201
         Map<Long, String> codes = roomRepo.findAll().stream()
             .collect(Collectors.toMap(Room::getId, Room::getCode));
 
+        // R201 NO debe salir
         Assertions.assertThat(list)
-            .noneSatisfy(p -> Assertions.assertThat(codes.get(p.getRoomId()))
-                .isEqualTo("R201"));
+            .noneSatisfy(p -> Assertions.assertThat(codes.get(p.getRoomId())).isEqualTo("R201"));
     }
 
 }
