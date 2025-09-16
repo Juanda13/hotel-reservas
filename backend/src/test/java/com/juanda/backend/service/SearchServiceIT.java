@@ -30,6 +30,13 @@ class SearchServiceIT extends PostgresTC {
             .isSortedAccordingTo((a, b) -> a.price().compareTo(b.price()));
         Assertions.assertThat(resp.results())
             .allSatisfy(r -> Assertions.assertThat(r.price()).isPositive());
+        Assertions.assertThat(resp.results())
+            .allSatisfy(r -> {
+                Assertions.assertThat(r.code()).isNotBlank();
+                Assertions.assertThat(r.amenities()).isNotNull();
+                // Por el seed, la mayoría traen "wifi": true
+                Assertions.assertThat(r.amenities()).containsKey("wifi");
+            });
     }
 
     @Test
