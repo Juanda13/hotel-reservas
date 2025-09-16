@@ -18,3 +18,7 @@ spring:
 logging:
   level:
     org.springframework: INFO
+
+app:
+  cors:
+    allowed-origins: "http://localhost:4200"
