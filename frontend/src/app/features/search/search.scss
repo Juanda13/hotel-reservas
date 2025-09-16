@@ -1,16 +1,25 @@
 .form-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(180px, 1fr));
-  gap: 12px;
+  gap: 16px;
   align-items: end;
+  margin-bottom: 16px;
 
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr 1fr;
-  }
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
+  .actions {
+    display: flex;
+    gap: 8px;
   }
 }
-mat-card {
-  margin-block: 12px;
+
+.full-width {
+  width: 100%;
+}
+
+.error {
+  color: #b00020;
+  margin-bottom: 8px;
+}
+
+.loading {
+  opacity: 0.8;
 }
