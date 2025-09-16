@@ -1,78 +1,102 @@
-<mat-card>
+<mat-card class="p-4">
   <h2>Buscar habitaciones</h2>
 
-  <form (ngSubmit)="submit()" [formGroup]="form" class="form-grid">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid">
     <mat-form-field appearance="outline">
       <mat-label>Check-in</mat-label>
       <input
         matInput
-        [matDatepicker]="pickerIn"
+        [matDatepicker]="dp1"
         formControlName="checkIn"
-        required
+        placeholder="aaaa-mm-dd"
       />
-      <mat-datepicker-toggle matSuffix [for]="pickerIn"></mat-datepicker-toggle>
-      <mat-datepicker #pickerIn></mat-datepicker>
+      <mat-datepicker-toggle matSuffix [for]="dp1"></mat-datepicker-toggle>
+      <mat-datepicker #dp1></mat-datepicker>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Check-out</mat-label>
       <input
         matInput
-        [matDatepicker]="pickerOut"
+        [matDatepicker]="dp2"
         formControlName="checkOut"
-        required
+        placeholder="aaaa-mm-dd"
       />
-      <mat-datepicker-toggle
-        matSuffix
-        [for]="pickerOut"
-      ></mat-datepicker-toggle>
-      <mat-datepicker #pickerOut></mat-datepicker>
+      <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
+      <mat-datepicker #dp2></mat-datepicker>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Huéspedes</mat-label>
-      <input matInput type="number" min="1" formControlName="guests" required />
+      <input matInput type="number" min="1" formControlName="guests" />
     </mat-form-field>
 
-    <button
-      mat-raised-button
-      color="primary"
-      type="submit"
-      [disabled]="form.invalid || loading()"
-    >
-      {{ loading() ? "Buscando..." : "Buscar" }}
-    </button>
+    <div class="actions">
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="loading()"
+      >
+        Buscar
+      </button>
+    </div>
   </form>
 
-  <p *ngIf="error()" style="color: var(--mat-sys-error)">⚠ {{ error() }}</p>
-</mat-card>
+  <div *ngIf="errorMsg()" class="error">{{ errorMsg() }}</div>
+  <div *ngIf="loading()" class="loading">Buscando...</div>
 
-<mat-card *ngIf="data()">
-  <h3>Resultados</h3>
   <table
+    *ngIf="!loading()"
     mat-table
-    [dataSource]="data()!.results"
-    class="mat-elevation-z1"
-    style="width: 100%"
+    [dataSource]="data()"
+    class="mat-elevation-z2 full-width"
   >
-    <ng-container matColumnDef="roomId">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let r">{{ r.roomId }}</td>
+    <!-- Código -->
+    <ng-container matColumnDef="code">
+      <th mat-header-cell *matHeaderCellDef>Código</th>
+      <td mat-cell *matCellDef="let r">{{ r.code }}</td>
     </ng-container>
+
+    <!-- Tipo -->
     <ng-container matColumnDef="type">
       <th mat-header-cell *matHeaderCellDef>Tipo</th>
-      <td mat-cell *matCellDef="let r">{{ r.type }}</td>
+      <td mat-cell *matCellDef="let r">{{ r.type | titlecase }}</td>
     </ng-container>
+
+    <!-- Capacidad -->
     <ng-container matColumnDef="capacity">
-      <th mat-header-cell *matHeaderCellDef>Capacidad</th>
+      <th mat-header-cell *matHeaderCellDef>Cap.</th>
       <td mat-cell *matCellDef="let r">{{ r.capacity }}</td>
     </ng-container>
+
+    <!-- Precio -->
     <ng-container matColumnDef="price">
       <th mat-header-cell *matHeaderCellDef>Precio</th>
-      <td mat-cell *matCellDef="let r">{{ r.price | currency : "USD" }}</td>
+      <td mat-cell *matCellDef="let r">
+        {{ r.price | currency : "USD" : "symbol" : "1.0-0" }}
+      </td>
+    </ng-container>
+
+    <!-- Amenidades -->
+    <ng-container matColumnDef="amenities">
+      <th mat-header-cell *matHeaderCellDef>Amenidades</th>
+      <td mat-cell *matCellDef="let r">
+        <mat-chip-set>
+          <mat-chip *ngFor="let c of amenityChips(r.amenities)">
+            {{ c }}
+          </mat-chip>
+        </mat-chip-set>
+      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+    <tr class="empty" *ngIf="data().length === 0">
+      <td [attr.colspan]="displayedColumns.length">
+        Sin resultados para el rango seleccionado.
+      </td>
+    </tr>
   </table>
 </mat-card>
