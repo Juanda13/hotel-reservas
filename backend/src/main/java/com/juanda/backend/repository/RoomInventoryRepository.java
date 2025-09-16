@@ -12,9 +12,11 @@ import java.util.List;
 public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Long> {
 
     @Query(value = """
-        SELECT r.id AS room_id,
+        SELECT r.id   AS room_id,
+               r.code AS code,
                r.type AS type,
                r.capacity AS capacity,
+               r.amenities::text AS amenities_json,
                SUM(ri.base_price) AS total_price
         FROM room r
         JOIN room_inventory ri ON ri.room_id = r.id
@@ -22,7 +24,7 @@ public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Lo
           AND ri.date >= :checkIn
           AND ri.date < :checkOut
           AND ri.is_blocked = FALSE
-        GROUP BY r.id, r.type, r.capacity
+        GROUP BY r.id, r.code, r.type, r.capacity, r.amenities
         HAVING COUNT(ri.id) = :nights
         ORDER BY total_price ASC
         """, nativeQuery = true)
