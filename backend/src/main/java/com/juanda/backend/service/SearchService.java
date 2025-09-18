@@ -5,6 +5,7 @@ import com.juanda.backend.web.dto.SearchResponseDTO;
 import com.juanda.backend.web.error.ApiValidationException;
 import com.juanda.backend.web.mapper.AvailabilityMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,6 +18,10 @@ public class SearchService {
     private final RoomInventoryRepository inventoryRepo;
     private final AvailabilityMapper mapper;
 
+    @Cacheable(
+        value = "search",
+        key = "T(java.lang.String).format('%s|%s|%s', #checkIn, #checkOut, #guests)"
+    )
     public SearchResponseDTO search(LocalDate checkIn, LocalDate checkOut, int guests) {
 
         if (checkIn == null || checkOut == null || !checkOut.isAfter(checkIn) || guests < 1) {
