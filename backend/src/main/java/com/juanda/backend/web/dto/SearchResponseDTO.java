@@ -1,10 +1,11 @@
 package com.juanda.backend.web.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public record SearchResponseDTO(
-    String checkIn,
-    String checkOut,
+    LocalDate checkIn,
+    LocalDate checkOut,
     int guests,
     List<SearchResultDTO> results,
     long total,         // total de resultados (antes de paginar)
