@@ -6,6 +6,10 @@ public record SearchResponseDTO(
     String checkIn,
     String checkOut,
     int guests,
-    List<SearchResultDTO> results
+    List<SearchResultDTO> results,
+    long total,         // total de resultados (antes de paginar)
+    Integer page,       // página solicitada (opcional)
+    Integer size,       // tamaño de página (opcional)
+    String sort         // ej: "price,asc" (opcional)
 ) {
 }
