@@ -7,11 +7,21 @@ export class ApiService {
   private http = inject(HttpClient);
   private readonly API_BASE_URL = "http://localhost:8080";
 
-  search(checkIn: string, checkOut: string, guests: number) {
-    const params = new HttpParams()
+  search(
+    checkIn: string,
+    checkOut: string,
+    guests: number,
+    opts?: { page?: number; size?: number; sort?: string }
+  ) {
+    let params = new HttpParams()
       .set("checkIn", checkIn)
       .set("checkOut", checkOut)
       .set("guests", guests);
+
+    if (opts?.page !== undefined) params = params.set("page", opts.page);
+    if (opts?.size !== undefined) params = params.set("size", opts.size);
+    if (opts?.sort) params = params.set("sort", opts.sort);
+
     return this.http.get<SearchResponse>(`${this.API_BASE_URL}/api/search`, {
       params,
     });
