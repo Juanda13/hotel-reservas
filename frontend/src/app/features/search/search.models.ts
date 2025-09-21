@@ -12,4 +12,8 @@ export interface SearchResponse {
   checkOut: string; // YYYY-MM-DD
   guests: number;
   results: SearchResult[];
+  total: number;
+  page?: number;
+  size?: number;
+  sort?: string;
 }
