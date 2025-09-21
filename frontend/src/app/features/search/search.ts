@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { Component, signal, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormControl,
@@ -18,6 +18,12 @@ import { MatTableModule } from "@angular/material/table";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from "@angular/material/paginator";
+import { MatSort, MatSortModule, Sort } from "@angular/material/sort";
 
 import { ApiService } from "../../core/api.service";
 import { SearchResult, SearchResponse } from "./search.models";
@@ -38,6 +44,8 @@ import { SearchResult, SearchResponse } from "./search.models";
     MatChipsModule,
     MatIconModule,
     MatTooltipModule,
+    MatPaginatorModule,
+    MatSortModule,
   ],
   templateUrl: "./search.html",
   styleUrl: "./search.scss",
@@ -59,8 +67,19 @@ export class SearchComponent {
 
   displayedColumns = ["code", "type", "capacity", "price", "amenities"];
   data = signal<SearchResult[]>([]);
+  total = signal(0);
+
   loading = signal(false);
   errorMsg = signal<string | null>(null);
+
+  // Estado de paginación/orden
+  pageIndex = 0;
+  pageSize = 5;
+  sortField: "price" | "capacity" | "type" | "code" = "price";
+  sortDirection: "asc" | "desc" = "asc";
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private api: ApiService) {}
 
@@ -71,7 +90,6 @@ export class SearchComponent {
       this.errorMsg.set("Revisa las fechas y la cantidad de huéspedes.");
       return;
     }
-
     const checkIn = this.form.value.checkIn!;
     const checkOut = this.form.value.checkOut!;
     const guests = this.form.controls.guests.value!;
@@ -83,20 +101,54 @@ export class SearchComponent {
       return;
     }
 
-    const ci = this.toIsoDate(checkIn);
-    const co = this.toIsoDate(checkOut);
+    // reinicia a página 0 cada nueva búsqueda
+    this.pageIndex = 0;
+    this.fetch();
+  }
+
+  onSortChange(e: Sort) {
+    // e.active: id de columna; e.direction: 'asc' | 'desc' | ''
+    if (!e.direction) {
+      // si limpian el sort, mantenemos default
+      this.sortField = "price";
+      this.sortDirection = "asc";
+    } else {
+      this.sortField = (e.active as typeof this.sortField) ?? "price";
+      this.sortDirection = e.direction as "asc" | "desc";
+    }
+    this.pageIndex = 0;
+    this.fetch();
+  }
+
+  onPage(ev: PageEvent) {
+    this.pageIndex = ev.pageIndex;
+    this.pageSize = ev.pageSize;
+    this.fetch();
+  }
+
+  private fetch() {
+    const ci = this.toIsoDate(this.form.value.checkIn!);
+    const co = this.toIsoDate(this.form.value.checkOut!);
+    const guests = this.form.controls.guests.value!;
 
     this.loading.set(true);
-    this.api.search(ci, co, guests).subscribe({
-      next: (resp: SearchResponse) => {
-        this.data.set(resp.results);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.errorMsg.set("Error consultando disponibilidad.");
-        this.loading.set(false);
-      },
-    });
+    this.api
+      .search(ci, co, guests, {
+        page: this.pageIndex,
+        size: this.pageSize,
+        sort: `${this.sortField},${this.sortDirection}`,
+      })
+      .subscribe({
+        next: (resp: SearchResponse) => {
+          this.data.set(resp.results);
+          this.total.set(resp.total ?? resp.results.length);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.errorMsg.set("Error consultando disponibilidad.");
+          this.loading.set(false);
+        },
+      });
   }
 
   private toIsoDate(d: Date): string {
@@ -109,20 +161,15 @@ export class SearchComponent {
   amenityChips(a: Record<string, unknown>): string[] {
     if (!a) return [];
     const chips: string[] = [];
-
-    // amenidades comunes (booleans)
     (["wifi", "ac", "tv", "minibar", "balcony"] as const).forEach((k) => {
       const v = a[k];
       if (typeof v === "boolean" && v) chips.push(k.toUpperCase());
     });
-
-    // otras claves simples como pares k=v
     Object.entries(a).forEach(([k, v]) => {
       if (["wifi", "ac", "tv", "minibar", "balcony"].includes(k)) return;
       if (["string", "number", "boolean"].includes(typeof v))
         chips.push(`${k}=${v}`);
     });
-
     return chips;
   }
 }
