@@ -30,4 +30,15 @@ public class RoomInventory {
     @Column(name = "is_blocked", nullable = false)
     private boolean blocked = false;
 
+    @Column(name = "is_booked", nullable = false)
+    private boolean booked = false;
+
+    public boolean isBooked() {
+        return booked;
+    }
+
+    public void setBooked(boolean booked) {
+        this.booked = booked;
+    }
+
 }
