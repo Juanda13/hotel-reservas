@@ -3,6 +3,7 @@ package com.juanda.backend.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,6 +30,8 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/swagger-ui.html",
                     "/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/bookings").permitAll()
                 .anyRequest().authenticated()
             );
         return http.build();

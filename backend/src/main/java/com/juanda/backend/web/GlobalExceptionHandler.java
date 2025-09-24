@@ -1,6 +1,7 @@
 package com.juanda.backend.web;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,7 +20,7 @@ public class GlobalExceptionHandler {
             .collect(Collectors.toMap(
                 fe -> fe.getField(),
                 fe -> fe.getDefaultMessage(),
-                (a, b) -> a // si se repite campo, quédate con el primero
+                (a, b) -> a
             ));
         return ResponseEntity.badRequest().body(Map.of(
             "timestamp", OffsetDateTime.now().toString(),
@@ -40,7 +41,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of(
             "timestamp", OffsetDateTime.now().toString(),
             "error", "BAD_REQUEST",
-            "message", "Constrain violation",
+            "message", "Constraint violation",
             "fields", violations
         ));
     }
@@ -56,7 +57,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<?> conflict(IllegalStateException ex) {
-        return ResponseEntity.badRequest().body(Map.of(
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
             "timestamp", OffsetDateTime.now().toString(),
             "error", "CONFLICT",
             "message", ex.getMessage()
