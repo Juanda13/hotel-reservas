@@ -110,7 +110,7 @@ public class BookingService {
     }
 
     private String generatedCode() {
-        byte[] buf = new byte[8] // 16 chars hex
+        byte[] buf = new byte[8]; // 16 chars hex
         random.nextBytes(buf);
         return HexFormat.of().withUpperCase().formatHex(buf);
     }
